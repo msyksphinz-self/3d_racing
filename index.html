@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEON VELOCITY — anti-gravity racing</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M2 22 L30 10 L22 22 Z' fill='%2322d3ee'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <div id="hud">
+    <div id="top-left" class="panel">
+      <div class="label">LAP</div><div class="value"><span id="lap">1</span><small>/3</small></div>
+      <div class="label">POS</div><div class="value"><span id="pos">1</span><small>/6</small></div>
+    </div>
+    <div id="top-right" class="panel">
+      <div class="row"><span class="label">TIME</span><span id="time" class="mono">00:00.000</span></div>
+      <div class="row"><span class="label">LAP</span><span id="laptime" class="mono">--:--.---</span></div>
+      <div class="row"><span class="label">BEST</span><span id="best" class="mono">--:--.---</span></div>
+    </div>
+    <div id="speedo">
+      <div id="speed">000</div><div class="unit">km/h</div>
+      <div id="boostwrap"><div id="boostfill"></div><span>BOOST</span></div>
+    </div>
+    <canvas id="minimap" width="220" height="220"></canvas>
+    <div id="mute" class="tiny">M: SOUND ON</div>
+    <div id="center"></div>
+    <div id="results" class="hidden"></div>
+    <div id="vignette"></div>
+    <div id="flash"></div>
+    <div id="title">
+      <h1>NEON<br />VELOCITY</h1>
+      <p class="sub">ANTI-GRAVITY RACING</p>
+      <div class="controls">
+        <div><kbd>W</kbd>/<kbd>&uarr;</kbd> ACCEL &nbsp; <kbd>S</kbd>/<kbd>&darr;</kbd> BRAKE</div>
+        <div><kbd>A</kbd><kbd>D</kbd>/<kbd>&larr;</kbd><kbd>&rarr;</kbd> STEER &nbsp; <kbd>SHIFT</kbd>/<kbd>SPACE</kbd> BOOST</div>
+        <div><kbd>R</kbd> RESTART &nbsp; <kbd>P</kbd> PAUSE &nbsp; <kbd>M</kbd> MUTE &nbsp; Gamepad OK</div>
+      </div>
+      <p class="press">PRESS ANY KEY</p>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
