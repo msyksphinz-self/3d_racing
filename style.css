@@ -38,7 +38,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #05060f; fon
 .hidden { display: none !important; }
 #vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 50%, rgba(3, 4, 14, 0.9) 100%); opacity: 0.3; }
 #flash { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(255, 230, 150, 0.9), rgba(255, 120, 40, 0.2) 70%); opacity: 0; mix-blend-mode: screen; }
-#title { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(ellipse at center, rgba(20, 8, 40, 0.55), rgba(3, 4, 14, 0.92)); text-align: center; }
+#title { pointer-events: auto; cursor: pointer; position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(ellipse at center, rgba(20, 8, 40, 0.55), rgba(3, 4, 14, 0.92)); text-align: center; }
 #title h1 { margin: 0; font-size: 96px; line-height: 0.9; font-weight: 900; font-style: italic; letter-spacing: 0.04em; background: linear-gradient(180deg, #fff, var(--cyan) 55%, var(--magenta)); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 24px rgba(34, 211, 238, 0.6)); }
 #title .sub { margin: 14px 0 28px; letter-spacing: 0.6em; color: var(--magenta); font-size: 14px; }
 #title .controls { font-size: 14px; line-height: 2; color: #bcd; }
@@ -52,4 +52,56 @@ kbd { display: inline-block; min-width: 22px; padding: 0 6px; border: 1px solid 
   #minimap { width: 140px; height: 140px; }
   .tiny { left: 170px; }
   #results { min-width: 0; width: 92vw; }
+}
+
+/* ---- touch controls ---- */
+#touch { position: absolute; inset: 0; pointer-events: none; }
+#t-steer { position: absolute; left: max(12px, env(safe-area-inset-left)); bottom: max(12px, env(safe-area-inset-bottom)); width: 42vw; max-width: 380px; height: 24vh; min-height: 96px; max-height: 150px; border-radius: 18px; background: rgba(34, 211, 238, 0.08); border: 1px solid rgba(34, 211, 238, 0.35); display: flex; align-items: center; justify-content: space-between; padding: 0 22px; pointer-events: auto; touch-action: none; -webkit-user-select: none; user-select: none; }
+#t-steer .arrow { font-size: 34px; color: rgba(255, 255, 255, 0.7); }
+#t-steer .hint { font-size: 11px; letter-spacing: 0.3em; color: rgba(159, 243, 255, 0.6); }
+#t-right { position: absolute; right: max(12px, env(safe-area-inset-right)); bottom: max(12px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 10px; align-items: flex-end; pointer-events: none; }
+#t-right button, #t-top button { pointer-events: auto; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; font: 700 14px/1 "Segoe UI", Arial, sans-serif; letter-spacing: 0.12em; padding: 0; overflow: hidden; color: #fff; background: rgba(5, 6, 16, 0.55); border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 50%; }
+#t-accel { width: 96px; height: 96px; border-color: rgba(34, 211, 238, 0.7) !important; }
+#t-brake { width: 72px; height: 72px; border-color: rgba(240, 67, 200, 0.7) !important; }
+#t-boost { width: 84px; height: 84px; border-color: rgba(255, 176, 46, 0.8) !important; color: #ffd27a !important; }
+#t-right button.active { background: rgba(255, 255, 255, 0.35); }
+#t-boost.active { background: rgba(255, 176, 46, 0.55); box-shadow: 0 0 22px #ffb02e; }
+#t-top { position: absolute; top: max(10px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); display: flex; gap: 10px; }
+#t-top button { border-radius: 10px; padding: 8px 12px; font-size: 12px; }
+body.touch #speedo { right: 120px; bottom: 130px; }
+body.touch #minimap { left: 18px; bottom: auto; top: 110px; width: 130px; height: 130px; }
+body.touch .tiny, body.touch .kb-only { display: none; }
+.touch-only { display: none; }
+body.touch .touch-only { display: inline; }
+#title .controls .touch-only { display: none; }
+body.touch #title .controls .touch-only { display: block; }
+#results .hint button { pointer-events: auto; font: 700 14px/1 "Segoe UI", Arial, sans-serif; letter-spacing: 0.2em; color: #05060f; background: var(--cyan); border: 0; border-radius: 8px; padding: 12px 22px; }
+#rotate { position: absolute; inset: 0; background: #05060f; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; color: var(--cyan); letter-spacing: 0.3em; }
+#rotate div { font-size: 72px; animation: spin 2s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* phones in landscape */
+@media (max-height: 520px) {
+  .panel { padding: 6px 10px; }
+  .value { font-size: 20px; }
+  .row { font-size: 12px; }
+  #speed { font-size: 44px; }
+  .unit { font-size: 10px; }
+  #boostwrap { width: 160px; height: 12px; }
+  body.touch #speedo { right: 118px; bottom: 118px; }
+  body.touch #minimap { top: 84px; width: 96px; height: 96px; }
+  #center { font-size: 28px; top: 26%; }
+  #center.big { font-size: 72px; }
+  #title h1 { font-size: 48px; }
+  #title .sub { margin: 8px 0 12px; }
+  #title .controls { font-size: 11px; line-height: 1.6; }
+  #title .press { margin-top: 14px; }
+  #results { padding: 14px 18px; min-width: 0; max-height: 92vh; overflow: auto; }
+  #results h2 { font-size: 18px; margin-bottom: 8px; }
+  #results table { font-size: 12px; }
+  #results .hint { margin-top: 8px; }
+  #t-accel { width: 78px; height: 78px; font-size: 11px; }
+  #t-brake { width: 60px; height: 60px; font-size: 9px; letter-spacing: 0.05em; }
+  #t-boost { width: 68px; height: 68px; font-size: 11px; }
+  #t-steer { height: 22vh; min-height: 80px; }
 }

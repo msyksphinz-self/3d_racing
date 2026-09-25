@@ -10,7 +10,7 @@ import { aiControl } from './ai.js';
 import { SpeedLines, Particles } from './effects.js';
 import { buildScenery } from './scenery.js';
 import { HUD } from './hud.js';
-import { Input } from './input.js';
+import { Input, IS_TOUCH } from './input.js';
 import { GameAudio } from './audio.js';
 import { clamp, damp } from './util.js';
 
@@ -20,8 +20,9 @@ const FIXED_DT = 1 / 120;
 // ---- renderer --------------------------------------------------------------
 
 const canvas = document.getElementById('game');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+const IS_MOBILE = IS_TOUCH && Math.min(window.screen.width, window.screen.height) < 900;
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: !IS_MOBILE, powerPreference: 'high-performance' });
+renderer.setPixelRatio(IS_MOBILE ? Math.min(window.devicePixelRatio, 1.0) : Math.min(window.devicePixelRatio, 1.5));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
@@ -34,7 +35,8 @@ scene.add(camera);
 
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
-const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.75, 0.5, 0.72);
+const bloomRes = IS_MOBILE ? new THREE.Vector2(window.innerWidth / 2, window.innerHeight / 2) : new THREE.Vector2(window.innerWidth, window.innerHeight);
+const bloom = new UnrealBloomPass(bloomRes, 0.75, 0.5, 0.72);
 composer.addPass(bloom);
 composer.addPass(new OutputPass());
 
@@ -51,11 +53,13 @@ const track = new Track();
 scene.add(track.group);
 buildScenery(scene, track);
 
-const speedLines = new SpeedLines(camera);
-const particles = new Particles(scene);
+const speedLines = new SpeedLines(camera, IS_MOBILE ? 90 : 160);
+const particles = new Particles(scene, IS_MOBILE ? 500 : 900);
 const input = new Input();
 const audio = new GameAudio();
 const hud = new HUD(track);
+hud.onRestart = () => { audio.start(); audio.resume(); startRace(); };
+setupTouchUI();
 
 const ROSTER = [
   { name: 'YOU', color: 0xffffff, accent: 0x22d3ee, isPlayer: true, ai: { skill: 0.95, offset: 0, phase: 0, aggression: 0.7 } },
@@ -275,12 +279,71 @@ function handleGlobalKeys() {
     return;
   }
   if (input.wasPressed('KeyR')) { audio.resume(); startRace(); }
-  if (input.wasPressed('KeyP') || input.wasPressed('Escape')) {
-    game.paused = !game.paused;
-    if (game.paused) hud.message('PAUSED', 1e9); else hud.clearMessage();
-    last = performance.now();
-  }
+  if (input.wasPressed('KeyP') || input.wasPressed('Escape')) togglePause();
   if (input.wasPressed('KeyM')) audio.toggleMute();
+}
+
+function togglePause(force) {
+  game.paused = force ?? !game.paused;
+  if (game.paused) hud.message('PAUSED', 1e9); else hud.clearMessage();
+  last = performance.now();
+}
+
+// ---- touch / mobile ---------------------------------------------------------
+
+function setupTouchUI() {
+  const $ = (id) => document.getElementById(id);
+  const touchEl = $('touch');
+  input.bindTouch({ steer: $('t-steer'), accel: $('t-accel'), brake: $('t-brake'), boost: $('t-boost') });
+  const showTouch = () => { touchEl.classList.remove('hidden'); document.body.classList.add('touch'); };
+  if (IS_TOUCH) showTouch();
+  window.addEventListener('touchstart', showTouch, { passive: true, once: true });
+
+  // Tapping the title screen starts the race, unlocks audio and goes fullscreen/landscape.
+  $('title').addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    audio.start();
+    audio.resume();
+    input.anyKey = true;
+    requestImmersive();
+  });
+  $('t-pause').addEventListener('click', () => { if (game.state !== 'title') togglePause(); });
+  $('t-mute').addEventListener('click', (e) => { e.currentTarget.textContent = audio.toggleMute() ? '\u{1F507}' : '\u{1F50A}'; });
+  $('t-tilt').addEventListener('click', async (e) => {
+    const on = await input.enableTilt(!input.tilt.enabled);
+    e.currentTarget.textContent = on ? 'TILT: ON' : 'TILT: OFF';
+  });
+  // Block the browser's own touch gestures over the game.
+  document.addEventListener('contextmenu', (e) => { if (input.touchActive) e.preventDefault(); });
+  document.addEventListener('gesturestart', (e) => e.preventDefault());
+
+  // Portrait hint.
+  const rotate = $('rotate');
+  const checkOrientation = () => {
+    const portrait = window.innerHeight > window.innerWidth;
+    rotate.classList.toggle('hidden', !(portrait && input.touchActive && IS_MOBILE));
+  };
+  window.addEventListener('resize', checkOrientation);
+  checkOrientation();
+
+  // Pause when the tab/app goes to the background.
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && game.state === 'racing' && !game.paused) togglePause(true);
+  });
+}
+
+async function requestImmersive() {
+  if (!IS_MOBILE) return;
+  try {
+    if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+      await document.documentElement.requestFullscreen({ navigationUI: 'hide' });
+    }
+    await screen.orientation?.lock?.('landscape');
+  } catch { /* not supported or denied: the game still runs in the page */ }
+}
+
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(() => {}); });
 }
 
 // Idle camera on the title screen: slow orbit around the grid.

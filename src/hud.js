@@ -54,7 +54,8 @@ export class HUD {
     this.el.results.innerHTML = `
       <h2>FINISH &mdash; ${ordinal(rank)} PLACE</h2>
       <table><thead><tr><th>#</th><th>PILOT</th><th>TOTAL</th><th>BEST LAP</th></tr></thead><tbody>${rows}</tbody></table>
-      <p class="hint">Press <b>R</b> to race again</p>`;
+      <p class="hint"><button id="again" type="button">RACE AGAIN</button><span class="kb-only"> &nbsp;or press <b>R</b></span></p>`;
+    this.el.results.querySelector('#again').addEventListener('click', () => this.onRestart?.());
     this.el.results.classList.remove('hidden');
   }
 

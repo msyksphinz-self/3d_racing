@@ -2,7 +2,13 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#05060f" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
   <title>NEON VELOCITY — anti-gravity racing</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M2 22 L30 10 L22 22 Z' fill='%2322d3ee'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="./style.css" />
@@ -26,6 +32,20 @@
     </div>
     <canvas id="minimap" width="220" height="220"></canvas>
     <div id="mute" class="tiny">M: SOUND ON</div>
+    <div id="touch" class="hidden">
+      <div id="t-steer"><span class="arrow">&#9664;</span><span class="hint">STEER</span><span class="arrow">&#9654;</span></div>
+      <div id="t-right">
+        <button id="t-boost" type="button">BOOST</button>
+        <button id="t-brake" type="button">BRAKE</button>
+        <button id="t-accel" type="button">ACCEL</button>
+      </div>
+      <div id="t-top">
+        <button id="t-pause" type="button">&#10074;&#10074;</button>
+        <button id="t-tilt" type="button">TILT: OFF</button>
+        <button id="t-mute" type="button">&#128266;</button>
+      </div>
+    </div>
+    <div id="rotate" class="hidden"><div>&#8635;</div><p>ROTATE TO LANDSCAPE</p></div>
     <div id="center"></div>
     <div id="results" class="hidden"></div>
     <div id="vignette"></div>
@@ -37,8 +57,9 @@
         <div><kbd>W</kbd>/<kbd>&uarr;</kbd> ACCEL &nbsp; <kbd>S</kbd>/<kbd>&darr;</kbd> BRAKE</div>
         <div><kbd>A</kbd><kbd>D</kbd>/<kbd>&larr;</kbd><kbd>&rarr;</kbd> STEER &nbsp; <kbd>SHIFT</kbd>/<kbd>SPACE</kbd> BOOST</div>
         <div><kbd>R</kbd> RESTART &nbsp; <kbd>P</kbd> PAUSE &nbsp; <kbd>M</kbd> MUTE &nbsp; Gamepad OK</div>
+        <div class="touch-only">TOUCH: auto-accel &middot; left pad steers &middot; right buttons brake / boost</div>
       </div>
-      <p class="press">PRESS ANY KEY</p>
+      <p class="press"><span class="kb-only">PRESS ANY KEY</span><span class="touch-only">TAP TO START</span></p>
     </div>
   </div>
 
